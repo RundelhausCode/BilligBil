@@ -1,0 +1,22 @@
+#main{
+    margin: 35px;
+}
+
+
+
+.log-in-form {
+    border: 1px solid #cacaca;
+    padding: 1rem;
+    border-radius: 0;
+
+}
+
+.car-pic{
+
+
+}
+.comment-box{
+    border-left: 6px solid red;
+    background-color: lightgrey;
+    padding: 3px;
+}
