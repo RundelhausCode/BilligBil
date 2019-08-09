@@ -111,6 +111,9 @@ session_start();
     {
         NewCarOModel($_POST);
     }
+    if (isset($_POST['ced'])){
+        editcar($_POST);
+    }
     function home(){
         echo '<h1 class="text-center">Velkommen til Billigbil</h1>';
         echo '<div class="grid-container">';
@@ -248,7 +251,8 @@ session_start();
 
         echo '<div class="grid-x grid-margin-x">';
         echo '<div class="cell small-2">';
-        if ($_SESSION['admin'] == 1){echo '<a class="button" href="?rcar">Rediger/sælge/slet bil</a>';}
+        if ($_SESSION['admin'] == 1){echo '<a class="button" href="?rcar='.$car->id .'">Rediger/sælge/slet bil</a>';}
+
         echo '</div>';
         echo '<div class="cell small-6">';
         echo '<h1><center>'.$brand.' '.$model->name.'</center></h1>';
@@ -555,12 +559,86 @@ session_start();
                 move_uploaded_file($temp_name,$path_filename_ext);
 
             }
+
         }
     }
-    function carste($car){
+    function carste($data){
         if($_SESSION['admin'] == 1){
-            echo 'admin log in';
+            $car = R::findOne('car','id='.$data['rcar']);
+            echo '<h1>opdatering af bilens data</h1>';
+            echo '<form method="post" id="foed" enctype="multipart/form-data">';
+            echo '<label>kørte km.: <input type="number" name="km" style="display: inline; width: 200px;" value="'.$car->km.'">';
+            echo '<label>pris: <input type="number" name="price" style="display: inline; width: 200px;" value="'.$car->price.'">';
+            echo '<label>alder: <input type="month" name="age" style="display: inline; width: 200px;" value="'.$car->age.'">';
+            echo '<label><p><b>nu værene model = '.R::findOne('model','id='.$car->model_id)->name.'</b></p>';
+            echo '<label >model: ';
+            echo '<select form="foed" name="model" style="width: auto">';
+            echo '<option disabled selected value> -- vælge en model-- </option>';
+            $model = R::findAll('model');
+            foreach ($model as $m){
+                echo '<option value="'.$m->id.'">'.$m->name.'</option>';
+            }
+            echo '</select>';
+            echo '</label>';
+            echo '<label><p><b>nu værene fave = '.R::findOne('color','id='.$car->color_id)->color.'</b></p>';
+            echo '<label >Fave: ';
+            echo '<select form="foed" name="color" style="width: auto">';
+            echo '<option disabled selected value> -- vælge en fave -- </option>';
+            $color = R::findAll('color','ORDER BY color');
+            foreach ($color as $c){
+                echo '<option value="'.$c->id.'">'.$c->color.'</option>';
+            }
+            echo '</select>';
+            echo '</label>';
+            echo '<label><p><b>nu værene sælger = '.R::findOne('dealer','id='.$car->dealer_id)->name.'</b></p>';
+            echo '<label >Sælge: ';
+            echo '<select form="foed" name="dealer" style="width: auto">';
+            echo '<option disabled selected value> -- vælge en sælge -- </option>';
+            $dealer = R::findAll('dealer','ORDER BY name');
+            foreach ($dealer as $d){
+                echo '<option value="'.$d->id.'">'.$d->name.'</option>';
+            }
+            echo '</select></label>';
+            echo '<label>solgt: ';
+            if ($car->sold == '0'){
+                echo '<input name="sold" type="checkbox">';
+            }else{ echo '<input name="sold" type="checkbox" checked>';}
+            echo '</label>';
+            echo '<button class="button" type="submit" name="ced" id="ced" value="'.$car->id.'"> ænder data</button>';
+            echo '</form>';
+
+
+
+
+
         }else{header('Location: ?home');}
+        function editcar($data){
+            $car = R::loadForUpdate('car',''.$data['ced']);
+            $car['km'] = $data['km'];
+            $car['price'] = $data['price'];
+            $car['age'] = $data['age'];
+            if ($data['model'] >0 ){
+                $car['model_id'] = $data['model'];
+            }
+            if ($data['color'] >0 ){
+                $car['color_id'] = $data['color'];
+            }
+            if ($data['dealer'] >0 ){
+                $car['dealer_id'] = $data['dealer'];
+            }
+            if ($data['sold'] == 'on'){
+                $car['sold'] = true;
+            }else{$car['sold'] = false;}
+            R::store($car);
+            
+        }
+        function sold($id){
+            echo '<h1>Test</h1>';
+            var_dump($id);
+            $car = R::loadForUpdate('car',''.$id['sold']);
+            $car['sold'] = 1;
+            R::store($car);
+        }
     }
     ?>
 
