@@ -328,7 +328,26 @@ session_start();
     }
     function chatadmin(){
         if($_SESSION['admin'] == 1){
-            echo 'admin log in';
+            $comments = R::find('comments','approved= 0');
+            echo '<table id="data" class="display" style="width:100%">';
+            echo '<thead>';
+            echo '<tr>';
+            echo '<th>comment id</th>';
+            echo '<th>Text</th>';
+            echo '<th>car id</th>';
+            echo '</tr>';
+            echo '</thead>';
+            echo '<tbody>';
+            foreach ($comments as $c) {
+                echo '<tr>';
+                echo '<td>'.$c->id.'</td>';
+                echo '<td>'.$c->text.'</td>';
+                echo '<td>'.$c->car_id.'</td>';
+                echo '</tr>';
+            }
+
+            echo '</tbody>';
+            echo '</table>';
         }else{header('Location: ?home');}
 
     }
@@ -630,7 +649,7 @@ session_start();
                 $car['sold'] = true;
             }else{$car['sold'] = false;}
             R::store($car);
-            
+
         }
         function sold($id){
             echo '<h1>Test</h1>';
